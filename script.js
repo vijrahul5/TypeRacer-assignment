@@ -117,6 +117,7 @@ function getStartingIndexOfWords() {
   }
   return arr;
 }
+
 function mainGameFunction(e) {
   let inputLength = textInput.value.length;
   let wordLength = textWordArr[currWordIndex].length;
