@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Type Racer</title>
+    <script src="./script.js" defer></script>
+    <link rel="stylesheet" href="style.css" defer />
+  </head>
+  <body>
+    <div id="mainContainer">
+      <div id="timer">0</div>
+      <div id="progressDisplay">
+        <img src="./assets/img/car-avatar.svg" alt="" id="carAvatar" />
+        <img src="./assets/img/finsih-flag-color.svg" alt="" id="flagAvatar"/>
+      </div>
+      <div id="typingArea">
+        <p id="typeText"></p>
+        <input
+          type="text"
+          id="typeInput"
+          placeholder="Type text here..."
+          autofocus
+        />
+      </div>
+    </div>
+    <div id="nextLevelContainer" class="hide">
+      <p id="wordsPerMinute">Your Words Per Minute are :</p>
+      <button id="nextLevel">Next Level</button>
+    </div>
+  </body>
+</html>
