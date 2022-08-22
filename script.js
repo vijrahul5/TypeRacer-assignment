@@ -193,6 +193,7 @@ function endGame() {
   )} wpm`;
   nextLevelContainer.classList.remove("hide");
 }
+
 nextLevelButton.addEventListener("click", () => {
   startNewGame();
 });
