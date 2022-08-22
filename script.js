@@ -13,11 +13,11 @@ let carAvatar = document.querySelector("#carAvatar");
 let textCharArr, textWordArr, textWordIndexArr;
 let timerId, timeElapsed;
 let inputTextCharArr, inputTextWordArr;
-let currCharIndex;
 let currWordIndex;
 let moveToNextWord;
 let progressIncrement;
 let currProgress;
+let spanArr;
 
 async function getNewText() {
   const fetchedData = await fetch(API_NAME);
@@ -29,11 +29,42 @@ async function getNewText() {
 async function renderNewText() {
   textDisplay.innerHTML = "";
   const text = await getNewText();
-  text.split("").forEach((char, index) => {
-    let newSpan = document.createElement("span");
-    newSpan.innerText = char;
-    textDisplay.appendChild(newSpan);
-  });
+
+  const spanOne = document.createElement("span");
+  const spanTwo = document.createElement("span");
+  const spanThree = document.createElement("span");
+  const spanFour = document.createElement("span");
+  const spanFive = document.createElement("span");
+
+  spanOne.classList.add("correct");
+  spanOne.classList.remove("incorrect");
+  spanOne.classList.remove("underline");
+
+  spanTwo.classList.add("correct");
+  spanTwo.classList.remove("incorrect");
+  spanTwo.classList.remove("underline");
+
+  spanThree.classList.add("incorrect");
+  spanThree.classList.remove("correct");
+  spanThree.classList.remove("underline");
+
+  spanFour.classList.remove("incorrect");
+  spanFour.classList.remove("correct");
+  spanFour.classList.add("underline");
+
+  spanFive.classList.remove("correct");
+  spanFive.classList.remove("incorrect");
+  spanFive.classList.remove("underline");
+
+  textDisplay.appendChild(spanOne);
+  textDisplay.appendChild(spanTwo);
+  textDisplay.appendChild(spanThree);
+  textDisplay.appendChild(spanFour);
+  textDisplay.appendChild(spanFive);
+
+  spanFive.textContent = text;
+
+  spanArr = [spanOne, spanTwo, spanThree, spanFour, spanFive];
   return [text.split(""), text.split(" ")];
 }
 
@@ -54,54 +85,42 @@ function stopTimer(id) {
   clearInterval(id);
 }
 
-function paintTextBefore(charIndex) {
-  const charSpanArr = textDisplay.querySelectorAll("span");
-  charSpanArr.forEach((charSpan, index) => {
-    if (index < charIndex) {
-      charSpan.classList.add("correct");
-      charSpan.classList.remove("incorrect");
-      charSpan.classList.remove("underline");
-    }
+function paintText(check) {
+  spanArr.forEach((ele, index) => {
+    ele.textContent = "";
   });
-}
-function paintText() {
-  const charSpanArr = textDisplay.querySelectorAll("span");
+  const spanOne = spanArr[0];
+  const spanTwo = spanArr[1];
+  const spanThree = spanArr[2];
+  const spanFour = spanArr[3];
+  const spanFive = spanArr[4];
+
   const wordStartIndex = textWordIndexArr[currWordIndex];
-  console.log(textCharArr[wordStartIndex]);
-  for (
-    let i = textInput.value.length;
-    i < textWordArr[currWordIndex].length;
-    i++
-  ) {
-    charSpanArr[wordStartIndex + i].classList.remove("correct");
-    charSpanArr[wordStartIndex + i].classList.remove("incorrect");
-    charSpanArr[wordStartIndex + i].classList.remove("underline");
+
+  for (let i = 0; i < wordStartIndex; i++) {
+    spanOne.textContent += textCharArr[i];
   }
+
   let flag = true;
   for (let i = 0; i < textInput.value.length; i++) {
-    if (
-      flag &&
-      charSpanArr[wordStartIndex + i].innerText === textInput.value[i]
-    ) {
-      charSpanArr[wordStartIndex + i].classList.add("correct");
-      charSpanArr[wordStartIndex + i].classList.remove("incorrect");
-      charSpanArr[wordStartIndex + i].classList.remove("underline");
+    if (flag && textInput.value[i] === textCharArr[wordStartIndex + i]) {
+      spanTwo.textContent += textCharArr[wordStartIndex + i];
     } else {
-      charSpanArr[wordStartIndex + i].classList.remove("correct");
-      charSpanArr[wordStartIndex + i].classList.add("incorrect");
-      charSpanArr[wordStartIndex + i].classList.remove("underline");
+      spanThree.textContent += textCharArr[wordStartIndex + i];
       flag = false;
     }
   }
-  if (wordStartIndex + textWordArr[currWordIndex].length < textCharArr.length) {
-    charSpanArr[
-      wordStartIndex + textWordArr[currWordIndex].length
-    ].classList.remove("underline");
-  }
-  if (wordStartIndex + textInput.value.length < textCharArr.length) {
-    charSpanArr[wordStartIndex + textInput.value.length].classList.add(
-      "underline"
-    );
+
+  if (check === "final") return;
+
+  spanFour.textContent = textCharArr[wordStartIndex + textInput.value.length];
+
+  for (
+    let i = wordStartIndex + textInput.value.length + 1;
+    i < textCharArr.length;
+    i++
+  ) {
+    spanFive.textContent += textCharArr[i];
   }
 }
 
@@ -126,11 +145,9 @@ function mainGameFunction(e) {
     currWordIndex === textWordArr.length - 1
   ) {
     endGame();
-    textInput.value = "";
-    currWordIndex++;
     progressUpdate("final");
-    paintTextBefore(textCharArr.length);
-    paintText();
+    paintText("final");
+    textInput.value = "";
     return;
   }
   if (inputLength > wordLength) {
@@ -141,7 +158,6 @@ function mainGameFunction(e) {
       progressUpdate();
     }
   }
-  paintTextBefore(textWordIndexArr[currWordIndex]);
   paintText();
 }
 
@@ -174,7 +190,6 @@ function progressReset() {
 async function startNewGame() {
   [textCharArr, textWordArr] = await renderNewText();
   timerId = startTimer();
-  currCharIndex = 0;
   currWordIndex = 0;
   inputTextCharArr = [];
   inputTextWordArr = [];
